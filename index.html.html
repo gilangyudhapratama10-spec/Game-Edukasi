@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sel Quest - Game Pembelajaran Biologi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #f1c40f;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ecf0f1;
+        }
+        
+        .game-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-item h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            height: 120px;
+            background: #3498db;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+            background: #fff;
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .card-front {
+            background: #3498db;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            color: #2c3e50;
+            font-weight: bold;
+            flex-direction: column;
+        }
+        
+        .card-back img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: #2ecc71;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #resetBtn {
+            background: #e74c3c;
+        }
+        
+        #resetBtn:hover {
+            background: #c0392b;
+        }
+        
+        .game-instructions {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .game-instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .game-instructions ul {
+            padding-left: 20px;
+        }
+        
+        .game-instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .completed {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .completed h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card {
+                height: 100px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sel Quest</h1>
+            <p class="subtitle">Game Edukasi Organel Sel</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-info">
+                <div class="info-item">
+                    <h3>Level</h3>
+                    <div class="info-value" id="level">1</div>
+                </div>
+                <div class="info-item">
+                    <h3>Skor</h3>
+                    <div class="info-value" id="score">0</div>
+                </div>
+                <div class="info-item">
+                    <h3>Waktu</h3>
+                    <div class="info-value" id="timer">60</div>
+                </div>
+            </div>
+            
+            <div class="game-board" id="gameBoard">
+                <!-- Kartu akan di-generate oleh JavaScript -->
+            </div>
+            
+            <div class="controls">
+                <button id="startBtn">Mulai Game</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+            
+            <div class="game-instructions">
+                <h3>Cara Bermain:</h3>
+                <ul>
+                    <li>Klik kartu untuk membalik dan mencocokkan organel sel dengan fungsinya</li>
+                    <li>Setiap pasangan yang cocok akan memberi Anda 10 poin</li>
+                    <li>Selesaikan game sebelum waktu habis untuk mendapatkan bonus</li>
+                    <li>Game terdiri dari 3 level dengan kesulitan meningkat</li>
+                </ul>
+            </div>
+            
+            <div class="completed" id="completed">
+                <h2>Selamat! Anda telah menyelesaikan game!</h2>
+                <p>Skor akhir Anda: <span id="finalScore">0</span></p>
+                <button id="playAgain">Main Lagi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data organel sel dan fungsinya
+        const cellOrganelles = [
+            { name: "Nukleus", function: "Mengontrol aktivitas sel", emoji: "🧬" },
+            { name: "Mitokondria", function: "Pembangkit energi sel", emoji: "⚡" },
+            { name: "Kloroplas", function: "Fotosintesis", emoji: "🌿" },
+            { name: "Retikulum Endoplasma", function: "Transportasi protein", emoji: "🔄" },
+            { name: "Badan Golgi", function: "Memodifikasi dan mengemas protein", emoji: "📦" },
+            { name: "Membran Sel", function: "Melindungi dan mengatur keluar masuk zat", emoji: "🛡️" },
+            { name: "Sitoplasma", function: "Tempat reaksi kimia sel", emoji: "🧪" },
+            { name: "Lisosom", function: "Pencernaan intraseluler", emoji: "🔍" }
+        ];
+
+        // Variabel game state
+        let score = 0;
+        let level = 1;
+        let timeLeft = 60;
+        let timer;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let gameStarted = false;
+        let totalPairs;
+
+        // Elemen DOM
+        const gameBoard = document.getElementById('gameBoard');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const completedScreen = document.getElementById('completed');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const playAgainBtn = document.getElementById('playAgain');
+
+        // Fungsi inisialisasi game
+        function initGame() {
+            gameBoard.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+            
+            // Tentukan jumlah pasangan berdasarkan level
+            totalPairs = Math.min(4 + level, 8);
+            
+            // Buat array untuk kartu
+            let cards = [];
+            
+            // Pilih organel secara acak berdasarkan level
+            let selectedOrganelles = [...cellOrganelles]
+                .sort(() => 0.5 - Math.random())
+                .slice(0, totalPairs);
+            
+            // Tambahkan kartu untuk setiap organel (dua kartu per organel)
+            selectedOrganelles.forEach(organelle => {
+                cards.push({ type: 'name', content: organelle.name, match: organelle.function, emoji: organelle.emoji });
+                cards.push({ type: 'function', content: organelle.function, match: organelle.name, emoji: organelle.emoji });
+            });
+            
+            // Acak urutan kartu
+            cards.sort(() => 0.5 - Math.random());
+            
+            // Buat elemen kartu
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.dataset.index = index;
+                cardElement.dataset.content = card.content;
+                cardElement.dataset.match = card.match;
+                
+                cardElement.innerHTML = `
+                    <div class="card-front">?</div>
+                    <div class="card-back">
+                        <div>${card.emoji}</div>
+                        <div>${card.content}</div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', () => flipCard(cardElement));
+                gameBoard.appendChild(cardElement);
+            });
+            
+            // Reset dan update tampilan
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = level;
+            timerDisplay.textContent = timeLeft;
+        }
+
+        // Fungsi untuk membalik kartu
+        function flipCard(card) {
+            if (!gameStarted || card.classList.contains('flipped') || flippedCards.length >= 2) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        // Fungsi untuk memeriksa kecocokan kartu
+        function checkMatch() {
+            const card1 = flippedCards[0];
+            const card2 = flippedCards[1];
+            
+            // Jika kartu cocok
+            if (card1.dataset.content === card2.dataset.match || card2.dataset.content === card1.dataset.match) {
+                setTimeout(() => {
+                    card1.style.visibility = 'hidden';
+                    card2.style.visibility = 'hidden';
+                    flippedCards = [];
+                    
+                    // Tambah skor dan pasangan yang cocok
+                    score += 10;
+                    matchedPairs++;
+                    scoreDisplay.textContent = score;
+                    
+                    // Periksa jika semua pasangan sudah cocok
+                    if (matchedPairs === totalPairs) {
+                        levelUp();
+                    }
+                }, 500);
+            } else {
+                // Jika tidak cocok, balik kartu kembali
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // Fungsi untuk naik level
+        function levelUp() {
+            if (level < 3) {
+                level++;
+                alert(`Selamat! Anda naik ke level ${level}`);
+                clearInterval(timer);
+                startGame();
+            } else {
+                endGame();
+            }
+        }
+
+        // Fungsi untuk memulai game
+        function startGame() {
+            gameStarted = true;
+            timeLeft = 60;
+            initGame();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            startBtn.disabled = true;
+        }
+
+        // Fungsi untuk mengakhiri game
+        function endGame() {
+            clearInterval(timer);
+            gameStarted = false;
+            
+            // Bonus waktu jika berhasil menyelesaikan
+            if (matchedPairs === totalPairs) {
+                score += timeLeft * 2;
+                scoreDisplay.textContent = score;
+            }
+            
+            finalScoreDisplay.textContent = score;
+            completedScreen.style.display = 'block';
+            startBtn.disabled = false;
+        }
+
+        // Fungsi untuk mereset game
+        function resetGame() {
+            clearInterval(timer);
+            gameStarted = false;
+            score = 0;
+            level = 1;
+            timeLeft = 60;
+            completedScreen.style.display = 'none';
+            initGame();
+            startBtn.disabled = false;
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetGame);
+        playAgainBtn.addEventListener('click', resetGame);
+
+        // Inisialisasi awal
+        initGame();
+    </script>
+</body>
+</html>
